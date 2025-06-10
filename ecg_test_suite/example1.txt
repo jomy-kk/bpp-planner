@@ -1,0 +1,24 @@
+ECG Test Case 1: Basic Signal Processing and QRS Detection
+
+DESCRIPTION:
+This test case implements a basic ECG processing pipeline for QRS complex detection and heart rate analysis. The pipeline should:
+
+1. Apply bandpass filtering (0.5-40 Hz) to remove baseline wander and high-frequency noise
+2. Apply notch filtering (50/60 Hz) to eliminate power line interference  
+3. Perform wavelet denoising to further reduce noise while preserving QRS morphology
+4. Use Pan-Tompkins algorithm for QRS complex detection
+5. Calculate instantaneous heart rate from R-peaks
+6. Flag abnormal beats based on RR interval deviations
+
+EXPECTED PIPELINE FLOW:
+timeseries -> [bandpass filter] -> timeseries -> [notch filter] -> timeseries -> [wavelet denoising] -> timeseries -> [QRS detector] -> event -> [heart rate calculator] -> scalar
+
+CHALLENGE:
+The planner must select the correct filtering blocks in the proper sequence, choose the appropriate QRS detection algorithm, and extract meaningful heart rate features. This tests basic signal preprocessing and temporal event detection capabilities.
+
+EXPECTED BLOCKS TO BE SELECTED:
+- bandpass_filter (for 0.5-40 Hz filtering)
+- notch_filter (for power line interference removal)  
+- wavelet_denoising (for noise reduction)
+- qrs_detector_pan_tompkins (for QRS detection)
+- heart_rate_calculator (for HR extraction) 
