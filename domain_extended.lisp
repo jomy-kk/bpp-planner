@@ -58,7 +58,8 @@
       (configure-all-blocks ?steps)
       (plan-all-step-pipelines ?steps)      ; NEW: intra-step planning
       (validate-step-boundaries ?steps)     ; NEW: boundary validation
-      (connect-all-blocks ?steps))))        ; Keep for compatibility
+      (connect-all-blocks ?steps)           ; Keep for compatibility
+      (check-best-practices ?steps))))      ; NEW: best practices checking
   
   ;; ========================================
   ;; BLOCK SELECTION PHASE - UNCHANGED
@@ -422,4 +423,69 @@
   (:- (= ?x ?x) ())
   (:- (member ?x (?x . ?rest)) ())
   (:- (member ?x (?y . ?rest)) ((member ?x ?rest)))
+
+  ;; ========================================
+  ;; BEST PRACTICES DETECTION AXIOMS - NEW
+  ;; ========================================
+
+  ;; BP1: Aliasing Risk Detection 
+  ;; Detects when lowpass_filter is followed by resampler with inadequate filtering
+  (:- (bp-aliasing-risk ?step1 ?step2 ?cutoff ?sampling-rate)
+      ((connected ?step1 ?step2)
+       (step-has-block ?step1 lowpass_filter)  ; Specific block: lowpass_filter
+       (step-has-block ?step2 resampler)       ; Specific block: resampler
+       (parameter-configured ?step1 low_freq ?cutoff)          ; Lowpass cutoff frequency
+       (parameter-configured ?step2 sampling_rate ?sampling-rate) ; New sampling rate
+       (eval (> ?cutoff (/ ?sampling-rate 2)))))              ; Cutoff > Nyquist frequency
+
+  ;; Generate warning when aliasing risk is detected
+  (:- (bp-violation aliasing-risk ?step1 ?step2)
+      ((bp-aliasing-risk ?step1 ?step2 ?cutoff ?sampling-rate)))
+
+  ;; Additional helper to get detailed info about the violation
+  (:- (bp-violation-details aliasing-risk ?step1 ?step2 ?cutoff ?sampling-rate ?nyquist)
+      ((bp-aliasing-risk ?step1 ?step2 ?cutoff ?sampling-rate)
+       (eval (setf ?nyquist (/ ?sampling-rate 2)))))
+
+  ;; ========================================
+  ;; BEST PRACTICES VIOLATION REPORTING - NEW
+  ;; ========================================
+
+  ;; Method to check for violations after connections are made
+  (:method (check-best-practices (?step1 ?step2 . ?rest))
+    ;; Check violations between step1 and step2, then continue with rest
+    ()
+    ((:ordered
+      (check-violation-between ?step1 ?step2)
+      (check-best-practices (?step2 . ?rest)))))
+
+  (:method (check-best-practices (?step))
+    ;; Single step - nothing to check
+    ()
+    ())
+
+  (:method (check-best-practices ())
+    ;; Empty list - done
+    ()
+    ())
+
+  ;; Method to check violations between two specific steps
+  (:method (check-violation-between ?step1 ?step2)
+    ;; If aliasing risk detected, report it
+    ((bp-aliasing-risk ?step1 ?step2 ?cutoff ?sampling-rate))
+    ((!report-aliasing-risk ?step1 ?step2 ?cutoff ?sampling-rate)))
+
+  (:method (check-violation-between ?step1 ?step2)
+    ;; No violations detected - this should be a catch-all case
+    ()
+    ())
+
+  ;; Operator to report aliasing risk
+  (:operator (!report-aliasing-risk ?step1 ?step2 ?cutoff ?sampling-rate)
+    ;; preconditions
+    ((bp-aliasing-risk ?step1 ?step2 ?cutoff ?sampling-rate))
+    ;; deletes
+    ()
+    ;; additions
+    ((aliasing-risk-detected ?step1 ?step2 ?cutoff ?sampling-rate)))
 )) 
