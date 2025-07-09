@@ -75,7 +75,7 @@ Planner/
 
 In the terminal:
 ```bash
-sbcl --eval "(progn (load \"test_4_step_no_rpeaks.lisp\") (quit))"
+sbcl --eval "(progn (load \"test_promblem*.lisp\") (quit))"
 ```
 
 ### Example Output
