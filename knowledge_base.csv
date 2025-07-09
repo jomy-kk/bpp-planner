@@ -1,0 +1,61 @@
+block_name,potential_purposes,input_type,output_type,input_output_porportion,parameters,category,also_referred_as
+bandpass_filter,denoising filter_frequencies,signal,signal,1:1,"(low_freq, ufloat),(high_freq, ufloat),(filter_order, uint)",filtering,bandpass filter
+notch_filter,denoising filter_frequencies,signal,signal,1:1,"(notch_freq, ufloat),(quality_factor, ufloat)",filtering,notch filter
+lowpass_filter,denoising filter_frequencies,signal,signal,1:1,"(low_freq, ufloat),(filter_order, uint)",filtering,lowpass filter LPF
+highpass_filter,denoising filter_frequencies,signal,signal,1:1,"(high_freq, ufloat),(filter_order, uint)",filtering,highpass filter HPF
+median_filter,denoising smoothing,signal,signal,1:1,"(window_size, uint),(window_overlap, uint)",filtering,median filter
+emd,denoising extracting_features reconstructing_signal,signal,signal,1:N,"(num_modes, uint),(stopping_criteria, str)",decomposition,EMD empirical mode decomposition
+r_peak_detector,detecting_temporal_points,signal,event,1:N,"(window_size, uint),(threshold_method, str)",detection,R peak detector
+p_wave_detector,detecting_temporal_points,signal,event,1:N,"(window_size, uint),(threshold_method, str)",detection,P wave detector
+segmenter,segmenting,signal,signal,1:N,"(window_size, uint),(window_overlap, uint)",segmentation,segmenter
+epoch_segmenter,segmenting,AND(signal event),signal,1+E:N,"(window_size, uint),(window_overlap, uint)",segmentation,epoch segmenter
+hrv_features_extractor,extracting_features,signal,features,1:N,"(window_size, uint),(window_overlap, uint)",feature_extraction,HRV features extractor
+fft,transforming_frequency_domain,signal,signal-freq,1:1,"(method, str),(low_freq, ufloat),(high_freq, ufloat),(window_size, uint),(window_overlap, uint)",transform,FFT fast fourier transform
+extracting_psd,extracting_features,signal-freq,distribution,1:1,"(low_freq, ufloat),(high_freq, ufloat)",feature_extraction,PSD power spectral density
+pca,reconstructing_signal reduce_dimensionality,OR(features signal),OR(features signal),N:M,"(num_components, uint),(variance_retained, ufloat)",decomposition,PCA principal component analysis
+resampler,resampling,signal,signal,1:1,"(sampling_rate, ufloat),(method, str)",resampling,resampler
+normalizer,normalizing,OR(features signal signal-freq),OR(features signal signal-freq),N:N,"(min, ufloat),(max, ufloat)",normalizing,normalizer
+generic_features_extractor,extracting_features,signal,features,1:N,,feature_extraction,generic features extractor
+generic_features_selector,selecting_features reduce_dimensionality,features,features,N:M,,feature_selection,generic features selector
+agregate_features,arithmetics grouping,features,scalar,N:1,"(operation, str)",feature_extraction,aggregate features
+svm_classifier,classification training_ml predicting_ml,features,OR(none scalar),OR(N:0 N:1),"(num_trees, uint),(max_depth, uint),(kernel, str)",classification,SVM support vector machine
+svm_regressor,regression training_ml predicting_ml,features,OR(none scalar),OR(N:0 N:1),"(num_trees, uint),(max_depth, uint),(kernel, str)",regression,SVM support vector machine
+wavelet_denoising,denoising,signal,signal,1:1,"(wavelet_type, str),(level, uint)",denoising,wavelet denoising WD
+ica,artifact_removal feature_extraction,signal,signal,1:N,"(num_components, uint),(algorithm, str)",decomposition,ICA independent component analysis
+hilbert_transform,transforming_frequency_domain,signal,signal,1:1,,transform,Hilbert transform
+coherence_analysis,feature_extraction connectivity_analysis,signal,features,1:1,"(freq_band, ufloat)",connectivity,coherence COH
+cross_correlation,feature_extraction connectivity_analysis,signal signal,features,1:1,"(max_lag, uint)",connectivity,cross correlation xcorr
+autocorrelation,feature_extraction,signal,features,1:1,"(max_lag, uint)",feature_extraction,autocorrelation ACF
+spectrogram,time_frequency_analysis,signal,signal-freq,1:1,"(window_size, uint),(overlap, ufloat)",time_frequency,spectrogram
+wavelet_transform,time_frequency_analysis,signal,signal-freq,1:1,"(wavelet_type, str),(level, uint)",time_frequency,wavelet transform WT
+kalman_filter,denoising,signal,signal,1:1,"(process_noise_covariance, ufloat),(measurement_noise_covariance, ufloat)",filtering,Kalman filter
+phase_locking_value,feature_extraction connectivity_analysis,signal signal,features,1:1,"(freq_band, ufloat)",connectivity,PLV phase locking value
+event_related_potential_extractor,extracting_features,signal event,features,1+E:N,"(time_window, ufloat)",event_related,ERP event related potential extractor
+heart_rate_estimator,feature_extraction,signal,scalar,1:1,,feature_extraction,heart rate estimator
+qrs_complex_detector,detecting_temporal_points,signal,event,1:N,"(threshold, ufloat)",detection,QRS detector QRS complex detector
+t_wave_detector,detecting_temporal_points,signal,event,1:N,"(threshold, ufloat)",detection,T wave detector
+alpha_band_extractor,extracting_features,signal-freq,features,1:1,"(freq_range, ufloat)",feature_extraction,alpha band extractor
+beta_band_extractor,extracting_features,signal-freq,features,1:1,"(freq_range, ufloat)",feature_extraction,beta band extractor
+gamma_band_extractor,extracting_features,signal-freq,features,1:1,"(freq_range, ufloat)",feature_extraction,gamma band extractor
+delta_band_extractor,extracting_features,signal-freq,features,1:1,"(freq_range, ufloat)",feature_extraction,delta band extractor
+theta_band_extractor,extracting_features,signal-freq,features,1:1,"(freq_range, ufloat)",feature_extraction,theta band extractor
+event_related_synchronization,feature_extraction,signal event,features,1+E:N,"(time_window, ufloat)",event_related,ERS event related synchronization
+event_related_desynchronization,feature_extraction,signal event,features,1+E:N,"(time_window, ufloat)",event_related,ERD event related desynchronization
+spectral_entropy,feature_extraction,signal-freq,scalar,1:1,,feature_extraction,spectral entropy
+fractal_dimension_estimator,feature_extraction,signal,scalar,1:1,,feature_extraction,fractal dimension
+lyapunov_exponent_estimator,feature_extraction,signal,scalar,1:1,,feature_extraction,Lyapunov exponent
+permutation_entropy,feature_extraction,signal,scalar,1:1,"(order, uint)",feature_extraction,permutation entropy
+dfa,feature_extraction,signal,scalar,1:1,"(min_scale, uint),(max_scale, uint)",feature_extraction,DFA detrended fluctuation analysis
+hurst_exponent_estimator,feature_extraction,signal,scalar,1:1,,feature_extraction,Hurst exponent
+phase_amplitude_coupling,feature_extraction connectivity_analysis,signal signal,features,1:1,"(freq_band_low, ufloat),(freq_band_high, ufloat)",connectivity,PAC phase amplitude coupling
+granger_causality,feature_extraction connectivity_analysis,signal signal,features,1:1,"(model_order, uint)",connectivity,Granger causality
+mutual_information,feature_extraction connectivity_analysis,signal signal,scalar,1:1,,connectivity,mutual information
+phase_slope_index,feature_extraction connectivity_analysis,signal signal,scalar,1:1,,connectivity,PSI phase slope index
+spectral_coherence,feature_extraction connectivity_analysis,signal signal,features,1:1,"(freq_band, ufloat)",connectivity,spectral coherence
+microstate_analysis,feature_extraction,signal,features,1:1,"(num_microstates, uint)",feature_extraction,microstate analysis EEG microstate analysis
+sleep_stage_classification,classification,signal,scalar,1:1,"(model, str)",classification,sleep stage classification
+signal_quality_index,quality_assessment,signal,scalar,1:1,,quality_assessment,signal quality index SQI
+peak_detection,detecting_temporal_points,signal,event,1:N,"(threshold, ufloat)",detection,peak detection
+zero_crossing_detector,detecting_temporal_points,signal,event,1:N,,detection,zero crossing detector
+rms_calculation,feature_extraction,signal,scalar,1:1,,feature_extraction,RMS calculation
+signal_quantization,quantization,signal,signal,1:1,"(levels, uint)",quantization,signal quantization
