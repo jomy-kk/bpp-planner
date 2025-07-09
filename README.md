@@ -113,7 +113,7 @@ Plans:
 **Goal:** Test domain flexibility when preferred block unavailable.
 **Purpose:** Verifies the planner can find alternative solutions when a commonly-used block (bandpass filter) is not available. Tests adaptive planning and fallback strategies.
 
-### Problem 4
+### Partial solution and Problem 4
 **Goal:** Validate pre-existing solution with assigned blocks. 
 **Purpose:** Tests the domain's ability to validate and complete solutions where blocks are already assigned. Focuses on parameter configuration and connection validation rather than block selection.
 
