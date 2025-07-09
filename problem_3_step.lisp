@@ -28,6 +28,8 @@
    (block-purpose notch_filter filter_frequencies)
    (block-parameter notch_filter notch_freq)
    (block-parameter notch_filter quality_factor)
+   (block-input-type notch_filter signal)
+   (block-output-type notch_filter signal)
    
    (block-available lowpass_filter)
    (block-purpose lowpass_filter denoising)
@@ -107,9 +109,13 @@
    (block-purpose normalizer normalizing)
    (block-parameter normalizer min)
    (block-parameter normalizer max)
+   (block-input-type-option normalizer signal)
+   (block-output-type-option normalizer signal)
    
    (block-available generic_features_extractor)
    (block-purpose generic_features_extractor extracting_features)
+   (block-input-type generic_features_extractor signal)
+   (block-output-type generic_features_extractor features)
    
    (block-available generic_features_selector)
    (block-purpose generic_features_selector selecting_features)
@@ -154,7 +160,7 @@
    
    ;; Step 3: Extract features 
    (step-spec step3 extracting_features
-     ()
+     ((window_size 1.0) (window_overlap 0.5))
      ((input-hint signal) (output-hint features)))
    (step-needs-purpose step3 extracting_features))
   

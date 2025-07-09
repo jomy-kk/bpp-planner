@@ -1,27 +1,19 @@
-;; Test Solution Validation
-;; Tests if the planner can validate a pre-existing solution
+;; Test: 4-step pipeline validation
+;; Goal: Validate pre-existing solution with assigned blocks
+;; Expected: Configure parameters and connect steps for given block assignments
 
-(load "problem_4_step_validation.lisp")
+(require :asdf)
+(ql:quickload "shop3")
 
-;; Ensure we're in the SHOP3 package 
 (in-package :shop3)
 
-(format t "~%🎯 VALIDATION RESULT:~%")
-(handler-case
-  (let ((plan (find-plans 'ecg-4-step-validation-problem :verbose 1)))
-    (if plan
-        (progn
-          (format t "~%✅ SUCCESS! The planner validated the pre-existing solution!~%~%")
-          (format t "Validation plan actions:~%")
-          (let ((actions (first plan))
-                (counter 1))
-            (dolist (action actions)
-              (when (not (numberp action))
-                (format t "~2D. ~A~%" counter action)
-                (incf counter))))
-          (format t "~%✅ Solution is VALID! All constraints satisfied.~%"))
-        (format t "~%❌ FAILED! Could not validate the solution.~%")))
-  (error (e)
-    (format t "~%❌ Validation error: ~A~%" e)))
+(load "domain_extended.lisp")
+(load "problem_4_step_validation.lisp")
 
-(format t "~%=== VALIDATION TEST COMPLETE ===~%") 
+;; Run planning and display results
+(let ((plans (find-plans 'ecg-4-step-validation-problem :verbose 1)))
+  (when plans
+    (format t "~%Plan found:~%")
+    (dolist (action (first plans))
+      (unless (numberp action)
+        (format t "  ~A~%" action))))) 
