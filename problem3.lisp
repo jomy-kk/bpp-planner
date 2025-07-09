@@ -1,30 +1,22 @@
-;; 5-Step ECG Processing Problem
-;; Demonstrates complete three-layer architecture
+;; 5-Step ECG Processing Problem - NO BANDPASS FILTER
+;; Tests domain flexibility when obvious block choice is unavailable
 
 (require :asdf)
 (ql:quickload "shop3")
 
 (in-package :shop3)
 
-;; Load the extended domain
-(load "domain_extended.lisp")
+;; Load domain
+(load "domain.lisp")
 
-(defproblem ecg-5-step-problem extended-three-layer
+(defproblem ecg-5-step-no-bandpass-problem extended-three-layer
   
   ;; ========================================
-  ;; BLOCK KNOWLEDGE BASE - ALL Available Blocks from CSV
+  ;; BLOCK KNOWLEDGE BASE - ALL Blocks EXCEPT bandpass_filter
   ;; ========================================
   
-  ;; ALL 22 blocks from simpler_biosignal_blocks.csv
-  ((block-available bandpass_filter)
-   (block-purpose bandpass_filter denoising)
-   (block-purpose bandpass_filter filter_frequencies)
-   (block-parameter bandpass_filter low_freq)
-   (block-parameter bandpass_filter high_freq)
-   (block-parameter bandpass_filter filter_order)
-   (block-input-type bandpass_filter signal)
-   (block-output-type bandpass_filter signal)
-   (block-cardinality bandpass_filter 1 1)
+  ;; ALL blocks from CSV EXCEPT bandpass_filter (21 blocks instead of 22)
+  (;; REMOVED: bandpass_filter - the obvious choice for step1
    
    (block-available notch_filter)
    (block-purpose notch_filter denoising)
@@ -211,10 +203,11 @@
    (block-cardinality svm_regressor N 1)
    
    ;; ========================================
-   ;; STEP SPECIFICATIONS - WHAT WE WANT
+   ;; STEP SPECIFICATIONS - IDENTICAL to original 5-step
    ;; ========================================
    
-   ;; Step 1: Denoise with bandpass filter 0.5-45 Hz
+   ;; Step 1: SAME AS BEFORE - Denoise with bandpass filter 0.5-45 Hz
+   ;; BUT bandpass_filter is NOT AVAILABLE!
    (step-spec step1 denoising 
      ((low_freq 0.5) (high_freq 45.0) (filter_order 4))
      ((output-hint signal)))
@@ -245,12 +238,8 @@
    (step-needs-purpose step5 arithmetics))
   
   ;; ========================================
-  ;; GOAL: ECG PROCESSING PIPELINE (ARBITRARY LENGTH)
+  ;; GOAL: SAME 5-STEP PIPELINE
   ;; ========================================
   
-  ;; This single goal specification drives the entire planning process
-  ;; Domain handles arbitrary number of steps via list processing
-  
-  ;; Test 5-step pipeline:
-  ((process-pipeline (step1 step2 step3 step4 step5)))
-) 
+  ;; Test: What happens when preferred block is unavailable?
+  ((process-pipeline (step1 step2 step3 step4 step5)))) 

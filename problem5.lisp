@@ -1,15 +1,15 @@
-;; 5-Step ECG Processing Problem - NO BANDPASS FILTER
-;; Tests domain flexibility when obvious block choice is unavailable
+;; 4-Step ECG Processing Problem - NO R-PEAKS DETECTOR
+;; Tests valid pipeline without the problematic type incompatibility
 
 (require :asdf)
 (ql:quickload "shop3")
 
 (in-package :shop3)
 
-;; Load the generic domain
-(load "domain_extended.lisp")
+;; Load domain
+(load "domain.lisp")
 
-(defproblem ecg-5-step-no-bandpass-problem extended-three-layer
+(defproblem ecg-4-step-no-rpeaks-problem extended-three-layer
   
   ;; ========================================
   ;; BLOCK KNOWLEDGE BASE - ALL Blocks EXCEPT bandpass_filter
@@ -203,11 +203,10 @@
    (block-cardinality svm_regressor N 1)
    
    ;; ========================================
-   ;; STEP SPECIFICATIONS - IDENTICAL to original 5-step
+   ;; STEP SPECIFICATIONS - 4 STEPS WITHOUT R-PEAKS
    ;; ========================================
    
-   ;; Step 1: SAME AS BEFORE - Denoise with bandpass filter 0.5-45 Hz
-   ;; BUT bandpass_filter is NOT AVAILABLE!
+   ;; Step 1: Denoise with frequency filtering (no bandpass available)
    (step-spec step1 denoising 
      ((low_freq 0.5) (high_freq 45.0) (filter_order 4))
      ((output-hint signal)))
@@ -219,27 +218,22 @@
      ((input-hint signal) (output-hint signal)))
    (step-needs-purpose step2 resampling)
    
-   ;; Step 3: Detect R-peaks
-   (step-spec step3 detecting_temporal_points
-     ((window_size 0.1) (threshold_method adaptive))
-     ((input-hint signal) (output-hint event)))
-   (step-needs-purpose step3 detecting_temporal_points)
-   
-   ;; Step 4: Extract HRV features
-   (step-spec step4 extracting_features
+   ;; Step 3: Extract HRV features (DIRECTLY from signal, no R-peaks needed)
+   (step-spec step3 extracting_features
      ((window_size 60) (window_overlap 30))
      ((input-hint signal) (output-hint features)))
-   (step-needs-purpose step4 extracting_features)
+   (step-needs-purpose step3 extracting_features)
    
-   ;; Step 5: Aggregate to single value
-   (step-spec step5 arithmetics
+   ;; Step 4: Aggregate to single value
+   (step-spec step4 arithmetics
      ((operation mean))
      ((input-hint features) (output-hint scalar)))
-   (step-needs-purpose step5 arithmetics))
+   (step-needs-purpose step4 arithmetics))
   
   ;; ========================================
-  ;; GOAL: SAME 5-STEP PIPELINE
+  ;; GOAL: 4-STEP PIPELINE WITHOUT R-PEAKS
   ;; ========================================
   
-  ;; Test: What happens when preferred block is unavailable?
-  ((process-pipeline (step1 step2 step3 step4 step5)))) 
+  ;; Test: Valid type-compatible pipeline
+  ;; signal → signal → features → scalar
+  ((process-pipeline (step1 step2 step3 step4)))) 
